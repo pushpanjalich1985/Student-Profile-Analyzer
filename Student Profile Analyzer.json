@@ -1,0 +1,200 @@
+{
+  "name": "Student Profile Analyzer",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Student Profile Analyzer",
+        "formDescription": "Enter your profile details to find your ideal connections on HulChul",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Student Name"
+            },
+            {
+              "fieldLabel": "Student Bio / Profile",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Looking for"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        192,
+        0
+      ],
+      "id": "7c50882b-ba19-448f-aafb-bfb48dcc0433",
+      "name": "On form submission",
+      "webhookId": "2472506e-dd25-4ce8-9e74-26f35266aa00"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Student Name: {{ $('On form submission').item.json['Student Name'] }}\nBio: {{ $('On form submission').item.json['Student Bio / Profile'] }}\nLooking for: {{ $('On form submission').item.json['Looking for'] }}\n\nBased on this profile, return ONLY this JSON, no backticks:\n{\n  \"summary\": \"2 sentence summary of who this student is\",\n  \"strengths\": \"their top 3 skills or qualities\",\n  \"ideal_connections\": \"who they should connect with and why\",\n  \"icebreaker\": \"a warm intro message they could send to a potential connection\",\n  \"tags\": \"3-5 hashtag labels like #AIBuilder #Founder #Chennai\"\n}",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "You are an AI networking assistant for a student platform called HulChul.  Analyze this student profile and recommend who they should connect with.  Student Name: {{ $('On form submission').item.json['Student Name'] }} Bio: {{ $('On form submission').item.json['Student Bio / Profile'] }} Looking for: {{ $('On form submission').item.json['Looking for'] }}  Return a JSON object like this, nothing else, no backticks: {   \"summary\": \"2 sentence summary of who this student is\",   \"strengths\": \"their top 3 skills or qualities\",   \"ideal_connections\": \"who they should connect with and why\",   \"icebreaker\": \"a warm intro message they could send to a potential connection\",   \"tags\": \"3-5 hashtag labels like #AIBuilder #Founder #Chennai\" }"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9fdce753-bae0-4f11-85d8-4cfe3a93bb92",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        0
+      ],
+      "id": "761f1c0f-0e42-4e39-909f-69856eed6802",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "EHTJHWdmrivuDs1h",
+          "name": "Google Gemini(PaLM) Api account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "35f8b4d4-1ac3-8091-b59a-eea443f11d6c",
+          "mode": "list",
+          "cachedResultName": "Student Profiles",
+          "cachedResultUrl": "https://www.notion.so/35f8b4d41ac38091b59aeea443f11d6c"
+        },
+        "title": "={{ $node['On form submission'].json['Student Name'] }}",
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Summary|rich_text",
+              "textContent": "={{ $json.summary }}"
+            },
+            {
+              "key": "Strengths|rich_text",
+              "textContent": "={{ $json.strengths }}"
+            },
+            {
+              "key": "Ideal connections|rich_text",
+              "textContent": "={{ $json.ideal_connections }}"
+            },
+            {
+              "key": "IceBreaker|rich_text"
+            },
+            {
+              "key": "Tags|rich_text",
+              "textContent": "={{ $json.tags }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "27164a81-e041-47a9-8462-b286449366f8",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "GugbQG1S3D67o7sE",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.text;\n\n// Strip markdown code fences\nconst cleaned = raw.replace(/```json\\n?/g, '').replace(/```/g, '').trim();\n\nconst parsed = JSON.parse(cleaned);\n\nreturn [{\n  json: {\n    summary: parsed.summary,\n    strengths: parsed.strengths,\n    ideal_connections: parsed.ideal_connections,\n    icebreaker: parsed.icebreaker,\n    tags: parsed.tags\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        912,
+        144
+      ],
+      "id": "c8220709-4c8e-4067-b807-deb79f84f3d6",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "c2b35385-0922-4aae-8c2a-104263d475a8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d96e2b564cea662acddaed5ae8b2a8ce3f1a7d9ce8a2af3f012104016726dce9"
+  },
+  "id": "tr2p8ifvVsi7Vgbc",
+  "tags": []
+}
