@@ -75,7 +75,7 @@
     {
       "parameters": {
         "resource": "databasePage",
-        "da"databaseId": {
+        "databaseId": {
           "__rl": true,
           "value": "",
           "mode": "list"
