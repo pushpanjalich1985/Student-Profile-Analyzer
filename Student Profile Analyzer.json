@@ -28,8 +28,7 @@
         0
       ],
       "id": "7c50882b-ba19-448f-aafb-bfb48dcc0433",
-      "name": "On form submission",
-      "webhookId": "2472506e-dd25-4ce8-9e74-26f35266aa00"
+      "name": "On form submission"
     },
     {
       "parameters": {
@@ -76,12 +75,10 @@
     {
       "parameters": {
         "resource": "databasePage",
-        "databaseId": {
+        "da"databaseId": {
           "__rl": true,
-          "value": "35f8b4d4-1ac3-8091-b59a-eea443f11d6c",
-          "mode": "list",
-          "cachedResultName": "Student Profiles",
-          "cachedResultUrl": "https://www.notion.so/35f8b4d41ac38091b59aeea443f11d6c"
+          "value": "",
+          "mode": "list"
         },
         "title": "={{ $node['On form submission'].json['Student Name'] }}",
         "propertiesUi": {
@@ -192,9 +189,7 @@
   },
   "versionId": "c2b35385-0922-4aae-8c2a-104263d475a8",
   "meta": {
-    "templateCredsSetupCompleted": true,
-    "instanceId": "d96e2b564cea662acddaed5ae8b2a8ce3f1a7d9ce8a2af3f012104016726dce9"
+    "templateCredsSetupCompleted": true
   },
-  "id": "tr2p8ifvVsi7Vgbc",
   "tags": []
 }
